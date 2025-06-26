@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Messages</title>
+    <link rel="stylesheet" href="../assets/css/nav.css" />
+    <style>
+      body {
+        margin: 0;
+        font-family: "Segoe UI", sans-serif;
+        background-color: #f0f2f5;
+      }
+      .sender-name {
+        font-size: 12px;
+        font-weight: bold;
+        margin-bottom: 3px;
+        color: #333;
+      }
+
+      .container {
+        display: flex;
+        height: calc(100vh - 60px);
+      }
+
+      .sidebar {
+        width: 30%;
+        background-color: white;
+        border-right: 1px solid #ddd;
+        overflow-y: auto;
+      }
+
+      .chat-window {
+        width: 70%;
+        display: flex;
+        flex-direction: column;
+        background-color: #e5ddd5;
+      }
+
+      .user-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .user-list li {
+        padding: 15px;
+        border-bottom: 1px solid #eee;
+        cursor: pointer;
+      }
+
+      .user-list li:hover {
+        background-color: #f5f5f5;
+      }
+
+      .chat-header {
+        padding: 15px;
+        background-color: #075e54;
+        color: white;
+        font-weight: bold;
+      }
+
+      .chat-body {
+        flex-grow: 1;
+        padding: 20px;
+        overflow-y: auto;
+      }
+
+      .message {
+        margin-bottom: 10px;
+        padding: 10px;
+        border-radius: 10px;
+        max-width: 70%;
+        clear: both;
+      }
+
+      .sent {
+        background-color: #dcf8c6;
+        align-self: flex-end;
+        margin-left: auto;
+      }
+
+      .received {
+        background-color: white;
+        align-self: flex-start;
+        margin-right: auto;
+      }
+
+      .chat-input {
+        display: flex;
+        padding: 10px;
+        border-top: 1px solid #ccc;
+        background-color: white;
+      }
+
+      .chat-input input {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 20px;
+      }
+
+      .chat-input button {
+        margin-left: 10px;
+        padding: 10px 15px;
+        background-color: #075e54;
+        border: none;
+        color: white;
+        border-radius: 20px;
+        cursor: pointer;
+      }
+      .chat-body {
+        flex-grow: 1;
+        padding: 20px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        background-color: #ece5dd; /* WhatsApp-style background */
+      }
+
+      .chat-body.empty {
+        justify-content: center;
+        align-items: center;
+        color: #888;
+        font-style: italic;
+      }
+
+      .chat-window {
+        width: 70%;
+        display: flex;
+        flex-direction: column;
+        background-color: #e5ddd5;
+        border-left: 1px solid #ccc;
+      }
+      .sent-message {
+        background-color: #dcf8c6;
+        align-self: flex-end;
+      }
+
+      .received-message {
+        background-color: #fff;
+        align-self: flex-start;
+      }
+    </style>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="navbar-left">
+        <a href="index.html" class="logo-link">
+          <img src="../assets/images/logo.jpg" alt="LinkedIn" class="logo" />
+        </a>
+        <div class="search-box">
+          <span class="icon">🔍</span>
+          <input type="text" placeholder="Search" />
+        </div>
+      </div>
+
+      <div class="navbar-center">
+        <a href="index.html" class="nav-item">
+          <img src="../assets/icons/house.png" alt="Home" />
+          <span>Home</span>
+        </a>
+        <a href="mynetwork.html" class="nav-item">
+          <img src="../assets/icons/neural.png" alt="My Network" />
+          <span>Network</span>
+        </a>
+        <a href="jobs.html" class="nav-item">
+          <img src="../assets/icons/job.png" alt="Jobs" />
+          <span>Jobs</span>
+        </a>
+        <a href="message.html" class="nav-item">
+          <img src="../assets/icons/communication.png" alt="Messages" />
+          <span>Messages</span>
+        </a>
+
+        <a href="profile.html" class="nav-item">
+          <img
+            src="../assets/icons/profile.png"
+            alt="Me"
+            id="navUserPhoto"
+            class="avatar"
+          />
+          <span>Me</span>
+        </a>
+        <a href="login.html" class="nav-item">
+          <img src="../assets/icons/logout.png" alt="Notifications" />
+          <span>Log out</span>
+        </a>
+      </div>
+
+      <div class="navbar-right">
+        <a href="#" class="nav-item">
+          <img src="../assets/icons/hashtag.png" alt="Notifications" />
+          For Business</a
+        >
+        <a href="#" class="nav-item premium"
+          ><img src="../assets/icons/hashtag.png" alt="Notifications" />Try
+          Premium for ₹0</a
+        >
+      </div>
+    </nav>
+
+    <div class="container">
+      <div class="sidebar">
+        <ul class="user-list" id="userList">
+          <!-- Connected users will be listed here -->
+        </ul>
+      </div>
+
+      <div class="chat-window">
+        <div class="chat-header" id="chatHeader">Select a user</div>
+        <div class="chat-body" id="chatBody"></div>
+        <div class="chat-input">
+          <input
+            type="text"
+            id="messageInput"
+            placeholder="Type a message..."
+          />
+          <button onclick="sendMessage()">Send</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="../assets/js/firebase.js"></script>
+    <script>
+      let currentUserId = "";
+      let token = "";
+      let selectedUserId = "";
+      let currentUserName = "";
+
+      firebase.auth().onAuthStateChanged(async (user) => {
+        if (!user) return (window.location.href = "/pages/login.html");
+        currentUserId = user.uid;
+        currentUserName = user.displayName || "You";
+        token = await user.getIdToken();
+        loadConnectedUsers();
+      });
+
+      async function loadConnectedUsers() {
+        const res = await fetch("http://localhost:3000/api/users/connections", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await res.json();
+        const users = data.connections || [];
+
+        const list = document.getElementById("userList");
+        list.innerHTML = "";
+
+        if (users.length === 0) {
+          const li = document.createElement("li");
+          li.textContent = "No connections found.";
+          list.appendChild(li);
+          return;
+        }
+
+        users.forEach((user) => {
+          const li = document.createElement("li");
+          li.textContent = user.name;
+          li.style.display = "flex";
+          li.style.alignItems = "center";
+          li.style.gap = "10px";
+          li.onclick = () => {
+            selectedUserId = user._id;
+            document.getElementById("chatHeader").innerText = user.name;
+            loadMessages(selectedUserId);
+          };
+          list.appendChild(li);
+        });
+      }
+
+      async function loadMessages(targetId) {
+        try {
+          const res = await fetch(
+            `http://localhost:3000/api/messages/${targetId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          const data = await res.json();
+          const chatBody = document.getElementById("chatBody");
+          chatBody.innerHTML = "";
+
+          if (!data.messages || data.messages.length === 0) {
+            chatBody.classList.add("empty");
+            chatBody.innerText = "No messages yet. Start the conversation!";
+            return;
+          }
+
+          chatBody.classList.remove("empty");
+
+          data.messages.forEach((msg) => {
+            const isCurrentUser = msg.sender === currentUserId;
+
+            const wrapper = document.createElement("div");
+            wrapper.style.display = "flex";
+            wrapper.style.flexDirection = "column";
+            wrapper.style.alignItems = isCurrentUser
+              ? "flex-end"
+              : "flex-start";
+            wrapper.style.margin = "10px";
+
+            // Sender Name
+            const senderDiv = document.createElement("div");
+            senderDiv.textContent = isCurrentUser
+              ? "You"
+              : msg.senderName || "User";
+            senderDiv.style.fontSize = "12px";
+            senderDiv.style.color = "#888";
+            senderDiv.style.marginBottom = "3px";
+
+            // Message Bubble
+            const messageDiv = document.createElement("div");
+            messageDiv.className = isCurrentUser
+              ? "sent-message"
+              : "received-message";
+            messageDiv.textContent = msg.text;
+            messageDiv.style.padding = "10px";
+            messageDiv.style.borderRadius = "12px";
+            messageDiv.style.maxWidth = "60%";
+            messageDiv.style.backgroundColor = isCurrentUser
+              ? "#DCF8C6"
+              : "#FFF";
+            messageDiv.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
+            messageDiv.style.color = "#333";
+
+            // Timestamp
+            const timestamp = document.createElement("div");
+            const date = new Date(
+              msg.timestamp?._seconds
+                ? msg.timestamp._seconds * 1000
+                : msg.timestamp
+            );
+            timestamp.textContent = date.toLocaleTimeString("en-IN", {
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: true,
+            });
+            timestamp.style.fontSize = "10px";
+            timestamp.style.marginTop = "5px";
+            timestamp.style.color = "#999";
+
+            messageDiv.appendChild(timestamp);
+            wrapper.appendChild(senderDiv);
+            wrapper.appendChild(messageDiv);
+            chatBody.appendChild(wrapper);
+          });
+
+          // Scroll to bottom
+          chatBody.scrollTop = chatBody.scrollHeight;
+        } catch (error) {
+          console.error("Failed to load messages:", error);
+          document.getElementById("chatBody").innerText =
+            "Error loading messages.";
+        }
+      }
+
+      async function sendMessage() {
+        const text = document.getElementById("messageInput").value.trim();
+        if (!text || !selectedUserId) return;
+
+        const res = await fetch(
+          `http://localhost:3000/api/messages/send/${selectedUserId}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ text }),
+          }
+        );
+
+        if (res.ok) {
+          document.getElementById("messageInput").value = "";
+          loadMessages(selectedUserId);
+        } else {
+          const err = await res.json();
+          alert("Error: " + err.message);
+        }
+      }
+
+      let tokens = "";
+
+      firebase.auth().onAuthStateChanged(async (user) => {
+        if (!user) return (window.location.href = "/pages/login.html");
+        tokens = await user.getIdToken();
+
+        try {
+          const res = await fetch("http://localhost:3000/api/users/profile", {
+            headers: { Authorization: `Bearer ${tokens}` },
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            document.getElementById("navUserPhoto").src = data.photoURL;
+          }
+        } catch (err) {
+          console.error("Error fetching profile:", err);
+        }
+      });
+    </script>
+  </body>
+</html>

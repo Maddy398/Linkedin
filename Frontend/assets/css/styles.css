@@ -1,0 +1,115 @@
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #ffffff;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.login-container {
+  text-align: center;
+}
+
+.logo {
+  width: 100px;
+  margin-bottom: 30px;
+}
+
+.login-box {
+  background: #ffffff;
+  padding: 40px;
+  border-radius: 12px;
+  width: 440px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  text-align: left;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 24px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.google-btn,
+.apple-btn {
+  border: 1px solid #ddd;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.apple-btn .hee {
+  font-size: larger;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+a {
+  display: block;
+  text-align: left;
+  font-size: 14px;
+  margin: 10px 0;
+  color: #0a66c2;
+  text-decoration: none;
+}
+
+.remember {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+}
+
+.remember input {
+  margin-right: 6px;
+}
+
+button:last-of-type {
+  background: #0a66c2;
+  color: white;
+}
+
+.divider {
+  margin: 20px 0;
+  border-top: 1px solid #ccc;
+  position: relative;
+}
+
+.divider span {
+  background: white;
+  padding: 0 10px;
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 14px;
+  color: #999;
+}
+
+.signup-link {
+  margin-top: 15px;
+  font-size: 14px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+}

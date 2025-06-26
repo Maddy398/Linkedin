@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sign Up | LinkedIn</title>
+  <link rel="stylesheet" href="../assets/css/signup.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <link
+  rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+</head>
+<body>
+  <div class="container">
+    <img src="../assets/images/logo.jpg" alt="LinkedIn Logo" class="logo"/>
+    <div class="signup-box">
+      <h2>Make the most of your professional life</h2>
+
+      <form id="signup-form">
+        <label for="email">Email or phone number</label>
+        <input type="text" id="email" name="email" required />
+
+        <label for="password">Password (6+ characters)</label>
+        <input type="password" id="password" name="password" required minlength="6" />
+
+        <button onclick="signInWithEmail()">Agree & Join</button>
+
+        <p class="terms">
+          By clicking Agree & Join, you agree to the LinkedIn
+          <a href="#">User Agreement</a>, <a href="#">Privacy Policy</a>, and
+          <a href="#">Cookie Policy</a>.
+        </p>
+      </form>
+
+      <div class="divider"><span>or</span></div>
+
+      <button class="google-btn" onclick="signInWithGoogle()">
+        <i class="fab fa-google" style="margin-right: 8px;"></i> Continue with Google
+      </button>
+
+      <p class="signin-link">
+        Already on LinkedIn? <a href="login.html">Sign in</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+  <script src="../assets/js/signup.js"></script>
+</body>
+</html>

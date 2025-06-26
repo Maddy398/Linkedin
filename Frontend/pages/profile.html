@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Profile</title>
+  <link rel="stylesheet" href="../assets/css/nav.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f3f2ef;
+      margin: 0;
+    }
+
+    .profile-banner {
+      height: 200px;
+      background: url('../assets/images/banner.jpg') no-repeat center center;
+      background-size: cover;
+      position: relative;
+    }
+
+    .profile-main {
+      max-width: 900px;
+      margin: -70px auto 30px;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+    }
+
+    .profile-header {
+      display: flex;
+      align-items: center;
+    }
+
+    .profile-img {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid white;
+      background: #fff;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .edit-btn {
+      cursor: pointer;
+      color: #0a66c2;
+      font-size: 18px;
+      margin-left: 1px;
+    }
+
+    .profile-details {
+      margin-left: 20px;
+
+    }
+
+    .field {
+      margin-top: 30px;
+    }
+
+    .field-label {
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .field-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 5px;
+    }
+
+    .textarea-edit, .input-edit {
+      display: none;
+      margin-top: 10px;
+      width: 100%;
+      padding: 8px;
+    }
+
+    .save-btn {
+      display: none;
+      margin-top: 10px;
+      background-color: #0a66c2;
+      color: white;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    input[type="file"] {
+      margin-top: 10px;
+    }
+
+    .download-button {
+      text-align: center;
+      margin: 20px 0 40px;
+    }
+    .display{
+      display: none;
+    }
+
+    .download-button button {
+      background-color: #0a66c2;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+
+  <!-- html2canvas for download -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-left">
+      <a href="index.html" class="logo-link">
+        <img src="../assets/images/logo.jpg" alt="LinkedIn" class="logo" />
+      </a>
+      <div class="search-box">
+        <span class="icon">🔍</span>
+        <input type="text" placeholder="Search users..." id="searchInput" />
+      </div>
+    </div>
+
+    <div class="navbar-center">
+      <a href="index.html" class="nav-item">
+        <img src="../assets/icons/house.png" alt="Home" />
+        <span>Home</span>
+      </a>
+      <a href="mynetwork.html" class="nav-item">
+        <img src="../assets/icons/neural.png" alt="My Network" />
+        <span>Network</span>
+      </a>
+      <a href="jobs.html" class="nav-item">
+        <img src="../assets/icons/job.png" alt="Jobs" />
+        <span>Jobs</span>
+      </a>
+      <a href="message.html" class="nav-item">
+       <img src="../assets/icons/communication.png" alt="Messages" />
+       <span>Messages</span>
+      </a>
+      <a href="profile.html" class="nav-item" id="navProfileLink">
+        <img src="../assets/icons/profile.png" alt="Me" class="avatar" id="navUserPhoto" />
+        <span>Me</span>
+      </a>
+      <a href="login.html" class="nav-item" id="logoutBtn">
+        <img src="../assets/icons/logout.png" alt="Notifications" />
+        <span>Log out</span>
+      </a>
+    </div>
+
+    <div class="navbar-right">
+      <a href="#" class="nav-item"><img src="../assets/icons/hashtag.png" alt="Notifications" />For Business</a>
+      <a href="#" class="nav-item premium"><img src="../assets/icons/hashtag.png" alt="Notifications" />Try Premium for ₹0</a>
+    </div>
+  </nav>
+
+  <div class="profile-banner"></div>
+
+  <div class="profile-main" id="profileCard">
+    <div class="profile-header">
+      <div style="position: relative;">
+        <img src="../assets/icons/me.svg" id="profilePhoto" class="profile-img" />
+      </div>
+      <div class="profile-details">
+        <div class="field">
+          <div class="field-label">Name</div>
+          
+          <div class="field-content">
+            <div id="nameDisplay">Loading...</div>
+            <span class="edit-btn" onclick="toggleEdit('name')">✎</span>
+          </div>
+          <input id="nameInput" class="input-edit" />
+          <button class="save-btn" id="nameSave" onclick="saveField('name')">Update Name</button>
+        </div>
+        <div class="field">
+          <div class="field-label">Location</div>
+          <div class="field-content">
+            <div id="locationDisplay">Location: Not updated</div>
+            <span class="edit-btn" onclick="toggleEdit('location')">✎</span>
+          </div>
+          <input id="locationInput" class="input-edit" />
+          <button class="save-btn" id="locationSave" onclick="saveField('location')">Update Location</button>
+        </div>
+        <div class="connections" id="connectionCount">0 connections</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-label">Photo<span class="edit-btn" onclick="toggleEdit('photoURL')"> ✎ </span></div>
+      <div class="field-content">
+        <div id="photoURLDisplay" class="display">Manual update</div>
+      </div>
+      <input id="photoURLInput" class="input-edit" />
+      <button class="save-btn" id="photoURLSave" onclick="saveField('photoURL')">Update Photo URL</button>
+    </div>
+
+    <div class="field">
+      <div class="field-label">Bio</div>
+      <div class="field-content">
+        <div id="bioDisplay">Not updated</div>
+        <span class="edit-btn" onclick="toggleEdit('bio')">✎</span>
+      </div>
+      <textarea id="bioInput" class="textarea-edit" rows="2"></textarea>
+      <button class="save-btn" id="bioSave" onclick="saveField('bio')">Update Bio</button>
+    </div>
+
+    <div class="field">
+      <div class="field-label">Work</div>
+      <div class="field-content">
+        <div id="workDisplay">Not updated</div>
+        <span class="edit-btn" onclick="toggleEdit('work')">✎</span>
+      </div>
+      <textarea id="workInput" class="textarea-edit" rows="2"></textarea>
+      <button class="save-btn" id="workSave" onclick="saveField('work')">Update Work</button>
+    </div>
+
+    <div class="field">
+      <div class="field-label">Description</div>
+      <div class="field-content">
+        <div id="descriptionDisplay">Not updated</div>
+        <span class="edit-btn" onclick="toggleEdit('description')">✎</span>
+      </div>
+      <textarea id="descriptionInput" class="textarea-edit" rows="2"></textarea>
+      <button class="save-btn" id="descriptionSave" onclick="saveField('description')">Update Description</button>
+    </div>
+  </div>
+
+  <div class="download-button">
+    <button onclick="downloadProfileCard()">📥 Download Profile Card</button>
+  </div>
+
+  <script src="../assets/js/firebase.js"></script>
+  <script>
+    let token = "";
+
+    firebase.auth().onAuthStateChanged(async (user) => {
+      if (!user) return (window.location.href = "/pages/login.html");
+      token = await user.getIdToken();
+
+      try {
+        const res = await fetch("http://localhost:3000/api/users/profile", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          setField("name", data.name || user.displayName || "User");
+          setField("location", data.location || "Not updated");
+          setField("photoURL", data.photoURL || user.photoURL || "");
+          setField("bio", data.bio);
+          setField("work", data.work);
+          setField("description", data.description);
+          document.getElementById("profilePhoto").src = data.photoURL || user.photoURL || "../assets/icons/me.svg";
+          document.getElementById("connectionCount").textContent = `${data.connections?.length || 0} connections`;
+          document.getElementById("navUserPhoto").src = data.photoURL
+        }
+      } catch (err) {
+        console.error("Error fetching profile:", err);
+      }
+    });
+
+    function setField(field, value) {
+      if (["name", "location", "photoURL"].includes(field)) {
+        document.getElementById(`${field}Display`).textContent = value || "Not updated";
+        document.getElementById(`${field}Input`).value = value || "";
+      } else {
+        document.getElementById(`${field}Display`).textContent = value || "Not updated";
+        document.getElementById(`${field}Input`).value = value || "";
+      }
+    }
+
+    function toggleEdit(field) {
+      document.getElementById(`${field}Input`).style.display = "block";
+      document.getElementById(`${field}Save`).style.display = "inline-block";
+    }
+
+    async function saveField(field) {
+      const value = document.getElementById(`${field}Input`).value.trim();
+      const payload = { [field]: value };
+
+      try {
+        const res = await fetch("http://localhost:3000/api/users/profile", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (res.ok) {
+          setField(field, value);
+          if (field === "photoURL") {
+            document.getElementById("profilePhoto").src = value;
+            document.getElementById("navUserPhoto").src = value;
+          }
+          document.getElementById(`${field}Input`).style.display = "none";
+          document.getElementById(`${field}Save`).style.display = "none";
+        }
+      } catch (err) {
+        console.error(`Error updating ${field}:`, err);
+      }
+    }
+
+    document.getElementById("photoFileInput").addEventListener("change", async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      try {
+        const storageRef = firebase.storage().ref();
+        const userRef = storageRef.child(`profile_photos/${firebase.auth().currentUser.uid}`);
+        await userRef.put(file);
+        const downloadURL = await userRef.getDownloadURL();
+
+        document.getElementById("profilePhoto").src = downloadURL;
+        document.getElementById("navUserPhoto").src = downloadURL;
+        setField("photoURL", downloadURL);
+
+        await fetch("http://localhost:3000/api/users/profile", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ photoURL: downloadURL }),
+        });
+      } catch (err) {
+        console.error("Error uploading photo:", err);
+      }
+    });
+
+    function downloadProfileCard() {
+      const card = document.querySelector(".profile-main");
+      html2canvas(card).then((canvas) => {
+        const link = document.createElement("a");
+        link.download = "profile_card.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      });
+    }
+  </script>
+</body>
+</html>

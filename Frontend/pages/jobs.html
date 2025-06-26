@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LinkedIn Clone - Jobs</title>
+  <link rel="stylesheet" href="../assets/css/job.css" />
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f3f2ef;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .main {
+      display: flex;
+      padding: 20px;
+      gap: 20px;
+    }
+
+    .filters, .job-preview {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      min-width: 250px;
+    }
+
+    .filters h3 {
+      margin-bottom: 10px;
+    }
+
+    .job-listing {
+      flex: 1;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    .job-card {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      cursor: pointer;
+    }
+
+    .job-card:hover {
+      background-color: #e6f0ff;
+    }
+
+    .job-card h3 {
+      color: #0a66c2;
+    }
+
+    .apply-button, .job-preview button {
+      background-color: #0a66c2;
+      color: white;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .job-preview {
+      position: relative;
+      flex: 0 0 300px;
+      display: none;
+    }
+
+    .job-preview h3 {
+      color: #0a66c2;
+    }
+
+    .close-preview {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 20px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #666;
+    }
+
+    .close-preview:hover {
+      color: red;
+    }
+
+    .search-input{
+        width: auto;
+    }
+
+
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+  <div class="navbar-left">
+    <a href="index.html" class="logo-link">
+      <img src="../assets/images/logo.jpg" alt="LinkedIn" class="logo" />
+    </a>
+    <div class="search-box">
+      <span class="icon">🔍</span>
+      <input type="text" placeholder="Search" />
+    </div>
+  </div>
+
+  <div class="navbar-center">
+    <a href="index.html" class="nav-item">
+      <img src="../assets/icons/house.png" alt="Home" />
+      <span>Home</span>
+    </a>
+    <a href="mynetwork.html" class="nav-item">
+      <img src="../assets/icons/neural.png" alt="My Network" />
+      <span>Network</span>
+    </a>
+    <a href="jobs.html" class="nav-item">
+      <img src="../assets/icons/job.png" alt="Jobs" />
+      <span>Jobs</span>
+    </a>
+    <a href="message.html" class="nav-item">
+      <img src="../assets/icons/communication.png" alt="Messages" />
+      <span>Messages</span>
+    </a>
+
+    <a href="profile.html" class="nav-item" >
+      <img src="../assets/icons/profile.png" alt="Me" id="navUserPhoto" class="avatar" />
+      <span>Me</span>
+    </a>
+    <a href="login.html" class="nav-item">
+      <img src="../assets/icons/logout.png" alt="Notifications" />
+      <span>Log out</span>
+    </a>
+  </div>
+
+  <div class="navbar-right">
+    <a href="#" class="nav-item"><img src="../assets/icons/hashtag.png" alt="Notifications" />For Business</a>
+    <a href="#" class="nav-item premium"><img src="../assets/icons/hashtag.png" alt="Notifications" />Try Premium for ₹0</a>
+  </div>
+  </nav>
+
+  <div class="main">
+    <div class="filters">
+      <h3>Filters</h3>
+      <select id="typeFilter" class="search-input">
+        <option value="">All Types</option>
+        <option value="On-site">On-site</option>
+        <option value="Remote">Remote</option>
+        <option value="Hybrid">Hybrid</option>
+      </select>
+      <input type="text" id="locationFilter" placeholder="Location" class="search-input" />
+    </div>
+
+    <div class="job-listing">
+      <input type="text" id="searchInput" class="search-input" placeholder="Search jobs by title or company..." />
+      <div id="jobCards"></div>
+    </div>
+
+    <div class="job-preview" id="jobPreview">
+      <button class="close-preview" onclick="closePreview()">&times;</button>
+      <h3 id="previewTitle"></h3>
+      <p><strong>Company:</strong> <span id="previewCompany"></span></p>
+      <p><strong>Location:</strong> <span id="previewLocation"></span></p>
+      <p><strong>Type:</strong> <span id="previewType"></span></p>
+      <p><strong>Description:</strong></p>
+      <p id="previewDescription"></p>
+      <a id="previewLink" href="#" target="_blank">
+        <button class="apply-button">Apply Now</button>
+      </a>
+    </div>
+  </div>
+  <script src="../assets/js/firebase.js"></script>
+  <script>
+    const jobs = [
+      { title: 'Frontend Developer', company: 'Google', location: 'Bangalore', type: 'Remote', url: 'https://careers.google.com', description: 'Work on modern web interfaces using React.js.' },
+      { title: 'Backend Developer', company: 'Amazon', location: 'Hyderabad', type: 'On-site', url: 'https://www.amazon.jobs', description: 'Develop scalable backend systems with Node.js.' },
+      { title: 'Data Analyst', company: 'Flipkart', location: 'Bangalore', type: 'Hybrid', url: 'https://www.flipkartcareers.com', description: 'Interpret data and analyze results using statistical techniques.' },
+      { title: 'UX Designer', company: 'Microsoft', location: 'Noida', type: 'Remote', url: 'https://careers.microsoft.com', description: 'Design user-centric products and improve UI/UX.' },
+      { title: 'DevOps Engineer', company: 'IBM', location: 'Pune', type: 'On-site', url: 'https://www.ibm.com/careers', description: 'Maintain CI/CD pipelines and automate infrastructure.' },
+      { title: 'iOS Developer', company: 'Apple', location: 'Hyderabad', type: 'Hybrid', url: 'https://www.apple.com/jobs', description: 'Develop applications for Apple platforms.' },
+      { title: 'Android Developer', company: 'Samsung', location: 'Delhi', type: 'On-site', url: 'https://www.samsung.com/in/aboutsamsung/careers/', description: 'Work on Android mobile applications.' },
+      { title: 'AI Engineer', company: 'TCS', location: 'Mumbai', type: 'Remote', url: 'https://www.tcs.com/careers', description: 'Develop and deploy machine learning models.' },
+      { title: 'Project Manager', company: 'Infosys', location: 'Chennai', type: 'Hybrid', url: 'https://www.infosys.com/careers/', description: 'Manage and deliver IT projects.' },
+      { title: 'QA Tester', company: 'Wipro', location: 'Pune', type: 'Remote', url: 'https://careers.wipro.com', description: 'Test software and ensure quality.' },
+      { title: 'Cybersecurity Analyst', company: 'HCL', location: 'Noida', type: 'On-site', url: 'https://www.hcltech.com/careers', description: 'Monitor and protect systems from threats.' },
+      { title: 'Cloud Engineer', company: 'Oracle', location: 'Bangalore', type: 'Hybrid', url: 'https://www.oracle.com/careers/', description: 'Build and manage cloud solutions.' },
+      { title: 'Blockchain Developer', company: 'Polygon', location: 'Remote', type: 'Remote', url: 'https://polygon.technology/careers/', description: 'Develop blockchain-based applications.' },
+      { title: 'Tech Writer', company: 'Zoho', location: 'Chennai', type: 'Hybrid', url: 'https://www.zoho.com/careers/', description: 'Write documentation for software products.' },
+      { title: 'Full Stack Developer', company: 'Adobe', location: 'Bangalore', type: 'On-site', url: 'https://adobe.wd5.myworkdayjobs.com/en-US/external_experienced', description: 'Develop frontend and backend solutions.' },
+      { title: 'ML Researcher', company: 'OpenAI', location: 'Remote', type: 'Remote', url: 'https://openai.com/careers', description: 'Research and build cutting-edge AI models.' },
+      { title: 'Scrum Master', company: 'Capgemini', location: 'Mumbai', type: 'Hybrid', url: 'https://www.capgemini.com/careers/', description: 'Facilitate agile development processes.' },
+      { title: 'Game Developer', company: 'Ubisoft', location: 'Pune', type: 'On-site', url: 'https://www.ubisoft.com/en-us/company/careers', description: 'Design and develop video games.' },
+      { title: 'Product Designer', company: 'Swiggy', location: 'Bangalore', type: 'Hybrid', url: 'https://careers.swiggy.com/', description: 'Design product interfaces and experiences.' },
+      { title: 'System Architect', company: 'Intel', location: 'Hyderabad', type: 'Remote', url: 'https://jobs.intel.com', description: 'Architect large scale systems.' }
+    ];
+
+   const jobCardsContainer = document.getElementById("jobCards");
+    const searchInput = document.getElementById("searchInput");
+    const typeFilter = document.getElementById("typeFilter");
+    const locationFilter = document.getElementById("locationFilter");
+
+    function renderJobs() {
+      const search = searchInput.value.toLowerCase();
+      const type = typeFilter.value;
+      const location = locationFilter.value.toLowerCase();
+
+      jobCardsContainer.innerHTML = "";
+      jobs.filter(job => {
+        return (
+          (!search || job.title.toLowerCase().includes(search) || job.company.toLowerCase().includes(search)) &&
+          (!type || job.type === type) &&
+          (!location || job.location.toLowerCase().includes(location))
+        );
+      }).forEach(job => {
+        const card = document.createElement("div");
+        card.className = "job-card";
+        card.innerHTML = `
+          <h3>${job.title}</h3>
+          <p><strong>Company:</strong> ${job.company}</p>
+          <p><strong>Location:</strong> ${job.location}</p>
+          <p><strong>Type:</strong> ${job.type}</p>
+          <button class="apply-button" onclick="showPreview(${JSON.stringify(job).replace(/"/g, '&quot;')})">Apply Now</button>
+        `;
+        jobCardsContainer.appendChild(card);
+      });
+    }
+
+    function showPreview(job) {
+      document.getElementById("jobPreview").style.display = "block";
+      document.getElementById("previewTitle").textContent = job.title;
+      document.getElementById("previewCompany").textContent = job.company;
+      document.getElementById("previewLocation").textContent = job.location;
+      document.getElementById("previewType").textContent = job.type;
+      document.getElementById("previewDescription").textContent = job.description;
+      document.getElementById("previewLink").href = job.link;
+    }
+
+    function closePreview() {
+      document.getElementById("jobPreview").style.display = "none";
+    }
+
+    searchInput.addEventListener("input", renderJobs);
+    typeFilter.addEventListener("change", renderJobs);
+    locationFilter.addEventListener("input", renderJobs);
+    renderJobs();
+
+    let token = "";
+
+    firebase.auth().onAuthStateChanged(async (user) => {
+      if (!user) return (window.location.href = "/pages/login.html");
+      token = await user.getIdToken();
+
+      try {
+        const res = await fetch("http://localhost:3000/api/users/profile", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          document.getElementById("navUserPhoto").src = data.photoURL
+        }
+      } catch (err) {
+        console.error("Error fetching profile:", err);
+      }
+    });
+    renderJobs();
+  </script>
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Home</title>
+  <link rel="stylesheet" href="../assets/css/nav.css" />
+  <link rel="stylesheet" href="../assets/css/styls.css" />
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-left">
+      <a href="index.html" class="logo-link">
+        <img src="../assets/images/logo.jpg" alt="LinkedIn" class="logo" />
+      </a>
+      <div class="search-box">
+        <span class="icon">🔍</span>
+        <input type="text" placeholder="Search users..." id="searchInput" />
+      </div>
+    </div>
+
+    <div class="navbar-center">
+      <a href="index.html" class="nav-item">
+        <img src="../assets/icons/house.png" alt="Home" />
+        <span>Home</span>
+      </a>
+      <a href="mynetwork.html" class="nav-item">
+        <img src="../assets/icons/neural.png" alt="My Network" />
+        <span>Network</span>
+      </a>
+      <a href="jobs.html" class="nav-item">
+        <img src="../assets/icons/job.png" alt="Jobs" />
+        <span>Jobs</span>
+      </a>    
+      <a href="message.html" class="nav-item">
+       <img src="../assets/icons/communication.png" alt="Messages" />
+       <span>Messages</span>
+      </a>
+
+      <a href="profile.html" class="nav-item" id="navProfileLink">
+        <img src="../assets/icons/profile.png" alt="Me" class="avatar" id="navUserPhoto" />
+        <span>Me</span>
+      </a>
+      <a href="#" class="nav-item" id="logoutBtn">
+        <img src="../assets/icons/logout.png" alt="Logout" />
+        <span>Log out</span>
+      </a>
+    </div>
+
+    <div class="navbar-right">
+      <a href="#" class="nav-item"><img src="../assets/icons/hashtag.png" alt="Notifications" />For Business</a>
+      <a href="#" class="nav-item premium"><img src="../assets/icons/hashtag.png" alt="Notifications" />Try Premium for ₹0</a>
+    </div>
+  </nav>
+
+  <div class="layout">
+    <!-- Left Sidebar -->
+    <aside class="sidebar-left">
+      <div class="profile-card">
+        <img src="../assets/icons/me.svg" alt="Profile" class="profile-img" id="userPhoto"/>
+        <h3 class="profile-name">Welcome, <span id="userName">User</span></h3>
+        <p class="profile-info" id="userDescription"></p>
+      </div>
+    </aside>
+
+    <!-- Main Feed -->
+    <main class="feed-main">
+      <!-- Post creation box -->
+      <section class="create-post">
+        <form id="postForm" enctype="multipart/form-data">
+          <textarea id="postContent" name="content" placeholder="Start a post..." required></textarea>
+          <div class="post-actions">
+            <input type="file" id="postFile" name="file" accept="image/*,application/pdf" />
+            <button type="submit">Post</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Feed Posts -->
+      <section class="feed" id="feed">
+        <!-- Posts dynamically loaded here -->
+      </section>
+    </main>
+
+    <!-- Right Sidebar -->
+    <aside class="sidebar-right">
+      <div class="news-card">
+        <h4>LinkedIn News</h4>
+        <ul>
+          <li>🔹 India’s tech hiring picks up in 2025</li>
+          <li>🔹 Remote jobs remain in demand</li>
+          <li>🔹 Top skills employers seek</li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../assets/js/firebase.js"></script>
+  <script src="../assets/js/feed.js"></script>
+  <script>
+  firebase.auth().onAuthStateChanged(async (user) => {
+    if (user) {
+      const token = await user.getIdToken();
+
+      // Fetch user profile
+      try {
+        const res = await fetch("http://localhost:3000/api/users/profile", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          document.getElementById("userName").textContent = data.name || "User";
+          const descriptionEl = document.getElementById("userDescription");
+          descriptionEl.textContent = data.work && data.work.trim() !== "" ? data.work : "Update Your Details";
+          const photo = data.photoURL || "../assets/icons/me.svg";
+          document.getElementById("navUserPhoto").src = photo;
+          document.getElementById("userPhoto").src = photo;
+        } else {
+          document.getElementById("userDescription").textContent = "Update Your Details";
+        }
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+      }
+
+      // Load posts
+      loadFeed(token);
+
+      // Post submission
+      const postForm = document.getElementById("postForm");
+      postForm.addEventListener("submit", (e) => handleCreatePost(e, token));
+    } else {
+      window.location.href = "./login.html";
+    }
+  });
+
+  // Logout functionality
+  document.getElementById("logoutBtn").addEventListener("click", async (e) => {
+    e.preventDefault();
+    try {
+      await firebase.auth().signOut();
+      window.location.href = "./login.html";
+    } catch (err) {
+      console.error("Logout error:", err);
+    }
+  });
+</script>
+</body>
+</html>

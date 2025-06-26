@@ -1,0 +1,210 @@
+/* Base Reset & Font */
+/* Reset & Base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f3f2ef;
+  color: #1d2226;
+  line-height: 1.5;
+}
+
+/* Layout Grid */
+.layout {
+  display: grid;
+  grid-template-columns: 250px 1fr 300px;
+  gap: 20px;
+  max-width: 1200px;
+  margin: 80px auto 40px;
+  padding: 0 20px;
+}
+
+/* Navbar */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background-color: white;
+  border-bottom: 1px solid #ddd;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+}
+
+/* Left Sidebar */
+.sidebar-left {
+  position: sticky;
+  top: 80px;
+}
+.profile-card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+.profile-img {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+.profile-name {
+  font-size: 16px;
+  font-weight: bold;
+}
+.profile-info {
+  font-size: 14px;
+  color: #666;
+}
+
+/* Feed Main */
+.feed-main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Create Post */
+.create-post {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+.create-post textarea {
+  width: 100%;
+  height: 80px;
+  resize: none;
+  padding: 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+.post-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  gap: 12px;
+}
+.post-actions input[type="file"] {
+  flex: 1;
+  font-size: 14px;
+}
+.post-actions button {
+  background: #0a66c2;
+  color: white;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.2s ease;
+}
+.post-actions button:hover {
+  background: #004182;
+}
+
+/* Feed Posts */
+.feed .post {
+  background: white;
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+.post-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+.post-header button {
+  background: none;
+  border: none;
+  color: #f33;
+  font-size: 13px;
+  cursor: pointer;
+}
+.post-body {
+  font-size: 15px;
+  margin-bottom: 12px;
+}
+.post-body img {
+  margin-top: 10px;
+  border-radius: 6px;
+  max-width: 100%;
+}
+.post-actions button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #0a66c2;
+  font-size: 14px;
+  padding: 6px 0;
+  font-weight: 500;
+}
+.post-comments {
+  margin-top: 12px;
+}
+.post-comments p {
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+.comment-form {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+.comment-form input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  font-size: 14px;
+}
+.comment-form button {
+  padding: 6px 14px;
+  background-color: #e2e5ea;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 500;
+}
+.comment-form button:hover {
+  background-color: #d0d4da;
+}
+
+/* Right Sidebar */
+.sidebar-right {
+  position: sticky;
+  top: 80px;
+}
+.news-card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+.news-card h4 {
+  margin-bottom: 10px;
+  font-size: 16px;
+  font-weight: bold;
+}
+.news-card ul {
+  list-style: none;
+}
+.news-card li {
+  font-size: 14px;
+  padding: 6px 0;
+  color: #333;
+}
